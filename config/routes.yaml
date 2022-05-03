@@ -1,3 +1,4 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+archive:
+  path: '/'
+  controller: 'App\Controller\ArchiveController'
+  methods: [ 'POST' ]

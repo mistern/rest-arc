@@ -8,7 +8,7 @@ use App\Service\ArchiverMethod;
 use App\Service\ArchiverService;
 use App\Service\Exception\UnsupportedArchiveMethod;
 use App\Service\StatsRepository;
-use App\Tests\Doubles\ArchiverDouble;
+use App\Tests\Doubles\ArchiverMethodDouble;
 use App\Tests\Doubles\StatsRepositoryDouble;
 use Cake\Chronos\Chronos;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +19,7 @@ final class ArchiverServiceTest extends TestCase
 {
     public function testItArchivesFilesUsingProvidedMethod(): void
     {
-        $methods = [$method1 = new ArchiverDouble('m1')];
+        $methods = [$method1 = new ArchiverMethodDouble('m1')];
         $service = self::createArchiverService($methods);
 
         $service->archive('m1', 'archive.m1', [aFile()->build()], Chronos::now(), '0.0.0.0');
@@ -29,7 +29,7 @@ final class ArchiverServiceTest extends TestCase
 
     public function testItDoesntArchivesFilesUsingUnprovidedMethod(): void
     {
-        $methods = [$method1 = new ArchiverDouble('m1'), new ArchiverDouble('m2')];
+        $methods = [$method1 = new ArchiverMethodDouble('m1'), new ArchiverMethodDouble('m2')];
         $service = self::createArchiverService($methods);
 
         $service->archive('m2', 'archive.m2', [aFile()->build()], Chronos::now(), '0.0.0.0');
@@ -48,7 +48,7 @@ final class ArchiverServiceTest extends TestCase
 
     public function testItCreatesArchiveWithProvidedFilename(): void
     {
-        $methods = [$method = new ArchiverDouble('m1')];
+        $methods = [$method = new ArchiverMethodDouble('m1')];
         $service = self::createArchiverService($methods);
 
         $service->archive('m1', $expectedFilename = 'archive.m1', [aFile()->build()], Chronos::now(), '0.0.0.0');
@@ -62,15 +62,15 @@ final class ArchiverServiceTest extends TestCase
 
     public function testItCreatesArchiveWithProvidedFiles(): void
     {
-        $methods = [$method = new ArchiverDouble('m1')];
+        $methods = [$method = new ArchiverMethodDouble('m1')];
         $service = self::createArchiverService($methods);
 
         $service->archive(
             'm1',
             'archive.m1',
             $expectedFiles = [
-                aFile()->withOriginalFilename('/file1.dat')->build(),
-                aFile()->withOriginalFilename('/file2.dat')->build(),
+                aFile()->withOriginalFilename('file1.dat')->build(),
+                aFile()->withOriginalFilename('file2.dat')->build(),
             ],
             Chronos::now(),
             '0.0.0.0'
@@ -85,23 +85,23 @@ final class ArchiverServiceTest extends TestCase
 
     public function testItCreatesArchiveWithDeduplicatedFiles(): void
     {
-        $methods = [$method = new ArchiverDouble('m1')];
+        $methods = [$method = new ArchiverMethodDouble('m1')];
         $service = self::createArchiverService($methods);
 
         $service->archive(
             'm1',
             'archive.m1',
             [
-                aFile()->withOriginalFilename('/dedupe_file.dat')->build(),
-                aFile()->withOriginalFilename('/dedupe_file.dat')->build(),
+                aFile()->withOriginalFilename('dedupe_file.dat')->build(),
+                aFile()->withOriginalFilename('dedupe_file.dat')->build(),
             ],
             Chronos::now(),
             '0.0.0.0'
         );
 
         $expectedFiles = [
-            aFile()->withOriginalFilename('/dedupe_file.dat')->build(),
-            aFile()->withOriginalFilename('/dedupe_file(2).dat')->build(),
+            aFile()->withOriginalFilename('dedupe_file.dat')->build(),
+            aFile()->withOriginalFilename('dedupe_file(2).dat')->build(),
         ];
         self::assertEquals(
             $expectedFiles,
@@ -112,7 +112,7 @@ final class ArchiverServiceTest extends TestCase
 
     public function testItTracksDateTimeOfArchivingRequest(): void
     {
-        $methods = [new ArchiverDouble('m1')];
+        $methods = [new ArchiverMethodDouble('m1')];
         $statsRepository = new StatsRepositoryDouble();
         $service = new ArchiverService($methods, $statsRepository);
 
@@ -129,7 +129,7 @@ final class ArchiverServiceTest extends TestCase
 
     public function testItTracksIpAddressOfArchivingRequest(): void
     {
-        $methods = [new ArchiverDouble('m1')];
+        $methods = [new ArchiverMethodDouble('m1')];
         $statsRepository = new StatsRepositoryDouble();
         $service = new ArchiverService($methods, $statsRepository);
 
@@ -142,6 +142,20 @@ final class ArchiverServiceTest extends TestCase
         );
     }
 
+    public function testItDoesNotTrackStatsIfIpAddressIsNotProvided(): void
+    {
+        $methods = [new ArchiverMethodDouble('m1')];
+        $statsRepository = new StatsRepositoryDouble();
+        $service = new ArchiverService($methods, $statsRepository);
+
+        $service->archive('m1', 'archive.m1', [aFile()->build()], Chronos::now(), null);
+
+        self::assertFalse(
+            $statsRepository->tracked,
+            'Failed to assert that archiving request was not tracked if IP address is not provided.'
+        );
+    }
+
     /**
      * @param array<ArchiverMethod> $methods
      */
@@ -151,7 +165,7 @@ final class ArchiverServiceTest extends TestCase
     ): ArchiverService {
         $methods = null !== $methods
             ? $methods
-            : [new ArchiverDouble('m1')];
+            : [new ArchiverMethodDouble('m1')];
         $statsRepository = null !== $statsRepository
             ? $statsRepository
             : new StatsRepositoryDouble();

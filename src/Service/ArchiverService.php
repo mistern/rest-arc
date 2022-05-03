@@ -39,13 +39,15 @@ final class ArchiverService
         string $archiveFilename,
         array $files,
         DateTimeImmutable $dateTime,
-        string $ipAddress
+        ?string $ipAddress
     ): void {
         $deduplicatedFiles = self::deduplicateFiles($files);
         foreach ($this->archiverMethods as $archiverMethod) {
             if ($archiverMethod->supports($method)) {
                 $archiverMethod->archive($archiveFilename, $deduplicatedFiles);
-                $this->statsRepository->track($dateTime, $ipAddress);
+                if (null !== $ipAddress) {
+                    $this->statsRepository->track($dateTime, $ipAddress);
+                }
 
                 return;
             }
@@ -73,7 +75,7 @@ final class ArchiverService
                 continue;
             }
 
-            $originalFileDirname = pathinfo($originalFilename, PATHINFO_DIRNAME);
+            $originalFileDirname = ltrim(pathinfo($originalFilename, PATHINFO_DIRNAME), '.');
             $originalFileBasename = pathinfo($originalFilename, PATHINFO_FILENAME);
             $originalFileExtension = pathinfo($originalFilename, PATHINFO_EXTENSION);
             $deduplicatedFilename = sprintf(

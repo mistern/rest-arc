@@ -7,7 +7,7 @@ namespace App\Tests\Doubles;
 use App\Service\ArchiverMethod;
 use App\Service\File;
 
-final class ArchiverDouble implements ArchiverMethod
+final class ArchiverMethodDouble implements ArchiverMethod
 {
     public string $method;
     public bool $archived = false;
