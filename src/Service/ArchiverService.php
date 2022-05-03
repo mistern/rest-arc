@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Service\Exception\UnsupportedArchiveMethod;
+
 final class ArchiverService
 {
     /**
@@ -27,7 +29,11 @@ final class ArchiverService
         foreach ($this->archiverMethods as $archiverMethod) {
             if ($archiverMethod->supports($method)) {
                 $archiverMethod->archive($archiveFilename, $files);
+
+                return;
             }
         }
+
+        throw UnsupportedArchiveMethod::method($method);
     }
 }
