@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<psalm
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        errorLevel="1"
+        xmlns="https://getpsalm.org/schema/config"
+        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+        cacheDirectory="/tmp"
+>
+    <projectFiles>
+        <directory name="config"/>
+        <directory name="src"/>
+        <directory name="tests"/>
+        <ignoreFiles>
+            <directory name="vendor"/>
+            <directory name="var"/>
+            <file name="src/Kernel.php"/>
+        </ignoreFiles>
+    </projectFiles>
+
+    <extraFiles>
+        <directory name="var/cache/dev/Symfony/Config"/>
+    </extraFiles>
+
+    <issueHandlers>
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <referencedProperty name="PHPUnit\Framework\TestCase::$backupStaticAttributes"/>
+                <referencedProperty name="PHPUnit\Framework\TestCase::$runTestInSeparateProcess"/>
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+        <MissingFile>
+            <errorLevel type="suppress">
+                <file name="config/preload.php"/>
+                <file name="tests/bootstrap.php"/>
+            </errorLevel>
+        </MissingFile>
+    </issueHandlers>
+
+    <plugins>
+        <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin">
+            <containerXml>var/cache/dev/App_KernelDevDebugContainer.xml</containerXml>
+            <containerXml>var/cache/dev/App_KernelTestDebugContainer.xml</containerXml>
+        </pluginClass>
+    </plugins>
+</psalm>
