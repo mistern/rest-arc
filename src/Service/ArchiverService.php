@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Service\Exception\UnsupportedArchiveMethod;
+use DateTimeImmutable;
 
 use function pathinfo;
 use function sprintf;
@@ -19,24 +20,32 @@ final class ArchiverService
      * @var iterable<ArchiverMethod>
      */
     private iterable $archiverMethods;
+    private StatsRepository $statsRepository;
 
     /**
      * @param iterable<ArchiverMethod> $archiverMethods
      */
-    public function __construct(iterable $archiverMethods)
+    public function __construct(iterable $archiverMethods, StatsRepository $statsRepository)
     {
         $this->archiverMethods = $archiverMethods;
+        $this->statsRepository = $statsRepository;
     }
 
     /**
      * @param array<File> $files
      */
-    public function archive(string $method, string $archiveFilename, array $files): void
-    {
+    public function archive(
+        string $method,
+        string $archiveFilename,
+        array $files,
+        DateTimeImmutable $dateTime,
+        string $ipAddress
+    ): void {
         $deduplicatedFiles = self::deduplicateFiles($files);
         foreach ($this->archiverMethods as $archiverMethod) {
             if ($archiverMethod->supports($method)) {
                 $archiverMethod->archive($archiveFilename, $deduplicatedFiles);
+                $this->statsRepository->track($dateTime, $ipAddress);
 
                 return;
             }

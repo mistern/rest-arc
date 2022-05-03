@@ -5,6 +5,9 @@
     "amphp/byte-stream": {
         "version": "v1.8.1"
     },
+    "cakephp/chronos": {
+        "version": "2.3.0"
+    },
     "composer/package-versions-deprecated": {
         "version": "1.11.99.5"
     },
