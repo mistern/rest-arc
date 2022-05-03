@@ -11,7 +11,7 @@ final class FileTest extends TestCase
 {
     public function testItCreatesWithProvidedOriginalFilename(): void
     {
-        $file = new File($expectedFilename = '/provided_file.dat');
+        $file = new File($expectedFilename = 'provided_file.dat', '/filepath.dat');
 
         self::assertSame(
             $expectedFilename,
@@ -22,11 +22,18 @@ final class FileTest extends TestCase
 
     public function testItCreatesNewFileWithChangedOriginalFilename(): void
     {
-        $file = new File('/file1.dat');
+        $file = new File('file1.dat', '/filepath.dat');
 
-        $newFile = $file->withOriginalFilename($expectedFilename = '/file2.dat');
+        $newFile = $file->withOriginalFilename($expectedFilename = 'file2.dat');
 
         self::assertNotSame($newFile, $file);
         self::assertSame($expectedFilename, $newFile->originalFilename);
+    }
+
+    public function testItCreatesWithProvidedFilepath(): void
+    {
+        $file = new File('file.dat', $expectedFilepath = '/provided_filepath.dat');
+
+        self::assertSame($expectedFilepath, $file->filepath);
     }
 }

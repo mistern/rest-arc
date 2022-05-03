@@ -10,10 +10,12 @@ namespace App\Service;
 final class File
 {
     public string $originalFilename;
+    public string $filepath;
 
-    public function __construct(string $originalFilename)
+    public function __construct(string $originalFilename, string $filepath)
     {
         $this->originalFilename = $originalFilename;
+        $this->filepath = $filepath;
     }
 
     public function withOriginalFilename(string $originalFilename): self
