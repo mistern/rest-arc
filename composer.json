@@ -11,14 +11,19 @@
         "ext-iconv": "*",
         "ext-zip": "*",
         "cakephp/chronos": "^2.3",
+        "doctrine/doctrine-bundle": "^2.6",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.12",
         "symfony/console": "5.4.*",
         "symfony/dotenv": "5.4.*",
         "symfony/flex": "^1.17|^2",
         "symfony/framework-bundle": "5.4.*",
+        "symfony/proxy-manager-bridge": "5.4.*",
         "symfony/runtime": "5.4.*",
         "symfony/yaml": "5.4.*"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^7.0",
         "phpunit/phpunit": "^9.5",
         "psalm/plugin-symfony": "^3.1",
         "vimeo/psalm": "^4.23"
