@@ -40,4 +40,32 @@ final class ArchiverServiceTest extends TestCase
 
         $service->archive($method, 'archive.unsupported', [new File()]);
     }
+
+    public function testItCreatesArchiveWithProvidedFilename(): void
+    {
+        $methods = [$method = new ArchiverDouble('m1')];
+        $service = new ArchiverService($methods);
+
+        $service->archive('m1', $expectedFilename = 'archive.m1', [new File()]);
+
+        self::assertSame(
+            $expectedFilename,
+            $method->archiveFilename,
+            'Failed to assert that archive was created with provided filename.'
+        );
+    }
+
+    public function testItCreatesArchiveWithProvidedFiles(): void
+    {
+        $methods = [$method = new ArchiverDouble('m1')];
+        $service = new ArchiverService($methods);
+
+        $service->archive('m1', 'archive.m1', $expectedFiles = [new File(), new File()]);
+
+        self::assertEquals(
+            $expectedFiles,
+            $method->files,
+            'Failed to assert that archive was created with provided filename.'
+        );
+    }
 }
